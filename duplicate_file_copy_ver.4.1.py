@@ -4,13 +4,13 @@ import os
 import re
 
 # Raw 폴더 경로 가져오기
-RAW_FOLDER_PATH = "/Users/leitmotiv/Desktop/test/photo_test_folder/raw"
+RAW_FOLDER_PATH = ""
 # Selected 폴더 경로 가져오기
-SELECTED_FOLDER_PATH = "/Users/leitmotiv/Desktop/test/photo_test_folder/selected"
+SELECTED_FOLDER_PATH = ""
 # Selected 사진 파일 확장명
 SELETED_IMAGE_EXTENTIONS = ['.jpg', '.png']
 # Raw 사진 파일 확장명(xmp 포함)
-RAW_IMAGE_EXTENTIONS = ['.arw', '.cr2', '.xmp']
+RAW_IMAGE_EXTENTIONS = ['.arw', '.cr2', '.nef', '.xmp']
 
 
 """폴더 내 폴더 및 파일명 정보를 dictionary 형태로 출력합니다.
@@ -74,7 +74,7 @@ def caution_check(selected_info, raw_info):
             raise Exception(f"{folder} 폴더의 {cant_find_list}를 원본에서 찾을 수 없습니다.")
 
 
-def run(raw_folder_path, selected_folder_path, raw_extentions, selected_extentions):
+def run(config):
     """셀렉 폴더 내 파일명과 일치하는 원본 파일 탐색 후 복사
         ex) 셀렉폴더의 a.jpg 파일명과 일치하는 원본 파일 a.arw를 찾아서 따로 복사해 둡니다.
 
@@ -84,6 +84,11 @@ def run(raw_folder_path, selected_folder_path, raw_extentions, selected_extentio
         raw_extentions (list): 원본 파일 확장자 리스트
         selected_extentions (list): 셀렉 파일 확장자 리스트
     """
+
+    raw_folder_path = config.raw_dir
+    selected_folder_path = config.selected_dir
+    raw_extentions = config.raw_extentions
+    selected_extentions = config.selected_extentions
 
     selected_info = get_file_info(selected_folder_path, selected_extentions)
     raw_info = get_file_info(raw_folder_path, raw_extentions)
@@ -108,4 +113,16 @@ def run(raw_folder_path, selected_folder_path, raw_extentions, selected_extentio
     print("원본 파일의 복사를 완료하였습니다.")
 
 
-run(RAW_FOLDER_PATH, SELECTED_FOLDER_PATH, RAW_IMAGE_EXTENTIONS, SELETED_IMAGE_EXTENTIONS)
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    # Option
+    parser.add_argument("--raw_dir", type=str, required=True, help="Input raw image folder")
+    parser.add_argument("--selected_dir", type=str, required=True, help="Input selected image folder")
+    parser.add_argument("--raw_extentions", type=list, default=RAW_IMAGE_EXTENTIONS, help="Input raw image file extentions name list")
+    parser.add_argument("--selected_extentions", type=list, default=SELETED_IMAGE_EXTENTIONS, help="Input selected image file extentions name list")
+    args = parser.parse_args()
+
+    run(args)
